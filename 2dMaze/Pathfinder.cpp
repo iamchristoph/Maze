@@ -111,8 +111,8 @@ bool Pathfinder::importMaze(string file_name) {
 			return false;
 		}	//end if infile fails
 
-		for (int x = 0; x < 10; x++) {
-			for (int y = 0; y < 10; y++) {
+		for (int x = 0; x < MAZE_WIDTH; x++) {
+			for (int y = 0; y < MAZE_HEIGHT; y++) {
 					infile >> variable;
 					if (variable != "1" && variable != "0") {//checks invalid input
 					cout << "characters are not 1 and 0.  character: "<<variable<<endl;
@@ -187,22 +187,22 @@ vector<string> Pathfinder::solveMaze() {
 
 	Pathfinder::solvemaze(0,0);			//starting point
 
-	cout <<"path vector: "<<endl;
+	//cout <<"path vector: "<<endl;
 	if (path_vector.empty()){
 		cout << "Maze Unsolvable" << endl;  //if nothing in vector then no solution found
 	}
-
-	for(int i = 0;  i < path_vector.size(); i++){
-		cout << path_vector[i]<<endl;
-	}
-	cout << endl << "Test maze after run-through.  8 marks true path, 5 marks visited: " << endl;    
+	/*for (int i = 0; i < path_vector.size(); i++){
+		cout << path_vector[i] << endl;
+	}*/ //this prints path_vector
+	
+	/*cout << endl << "Test maze after run-through.  8 marks true path, 5 marks visited: " << endl;    
 	for (int y = 0; y < MAZE_WIDTH; y++) {             //the following for loops print the marked-up maze from beginning to end. 
 		for (int x = 0; x < MAZE_HEIGHT; x++) {        //shows true path and visited areas.
 				cout << test_maze[x][y] << " ";
 		}
 		cout << "\n";
 	}
-	cout << endl; 
+	cout << endl; */
 	return path_vector;
 
 }//end solvemaze
@@ -240,7 +240,8 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 	else if (current_x == (MAZE_WIDTH - 1) && current_y == (MAZE_HEIGHT - 1)) {
 		test_maze[current_x][current_y] = path; //cell is on path
 		path_vector.push_back(coords_to_string(current_x, current_y));
-		cout << "Exit Found." << endl;
+		full_path.push_back(Point(current_x, current_y));
+		//cout << "Exit Found." << endl;
 		return true;     			//and is maze exit
 	
 	}
@@ -252,7 +253,7 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 	test_maze[current_x][current_y] = path;  //mark as on path because coordinate is not out of bounds, maze exit, or barrier or dead end
 
 	path_vector.push_back(coords_to_string(current_x, current_y));
-
+	full_path.push_back(Point(current_x, current_y));
 
 
 	if(solvemaze(current_x+1, current_y) == true){
@@ -268,7 +269,7 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 		return true;
 	}
 	test_maze[current_x][current_y] = visited;  //been here, doesn't work
-	path_vector.pop_back(); //pop back coordinates.  Omit this line if you want the entire path of the maze traversal to be printed,
+	//path_vector.pop_back(); //pop back coordinates.  Omit this line if you want the entire path of the maze traversal to be printed,
 													//including all paths traversed, not just the solution path.
 													//note: doesn't print full return path, prints all paths tried, but after unsuccessful venture
 													//into a path it resumes at the point before that path.
@@ -279,3 +280,9 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 
 }  //end bool solvemaze
 
+
+
+
+vector<Point> Pathfinder::return_path(){
+	return full_path;
+}
