@@ -3,12 +3,27 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <stack>
 
 #ifndef PATHFINDER_H_
 #define PATHFINDER_H_
 
 
 using namespace std;
+
+struct Point{
+	int x;
+	int y;
+	Point(int x, int y){
+		this->x = x;
+		this->y = y;
+	}
+	Point(){
+		x = 0;
+		y = 0;
+	}
+};
+
 
 class Pathfinder {
 public:
@@ -88,6 +103,27 @@ public:
 	*/
 	bool solvemaze(int current_x, int current_y);
 
+	/*
+	*return_full_maze_path_ints
+	*returns a stack of ints as coordinates for the full path of the maze traversal.
+	*Every odd number is x coordinate, even number is y coordinate.
+	*/
+	stack<int> return_full_maze_path_ints();
+
+	/*
+	*return_full_maze_path_string
+	*returns a stack of strings as coordinates for the full path of the maze traversal
+	*in the form x, y.
+	*/
+	stack<string> return_full_maze_path_string();
+
+
+	/*
+	*return_path
+	*returns points of full maze traversal
+	*/
+	stack<Point> return_path();
+	vector<string> return_path_string();
 private:
 	static const int MAZE_WIDTH = 10;  //update this for maze width
 	static const int MAZE_HEIGHT = 10;  //update this for maze height
@@ -95,6 +131,7 @@ private:
 	int test_maze[MAZE_WIDTH][MAZE_HEIGHT];  //this maze is a copy of Maze[][], and is marked up with the path and visited cells for the solution.
 	int current_x;
 	int current_y;
+	vector<Point> full_path;  //patfh to end goal
 	vector<string> path_vector;
 };
 
