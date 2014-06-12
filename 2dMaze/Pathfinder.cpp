@@ -114,8 +114,8 @@ bool Pathfinder::importMaze(string file_name) {
 		for (int x = 0; x < MAZE_WIDTH; x++) {
 			for (int y = 0; y < MAZE_HEIGHT; y++) {
 					infile >> variable;
-					if (variable != "1" && variable != "0") {//checks invalid input
-					cout << "characters are not 1 and 0.  character: "<<variable<<endl;
+					if (variable != "1" && variable != "0" && variable != "2" && variable != "3") {//checks invalid input  changed 6/11
+					cout << "characters are not 1, 0, 2, or 3.  character: "<<variable<<endl;
 						is_valid = false;
 					}
 			}
@@ -172,28 +172,52 @@ bool Pathfinder::importMaze(string file_name) {
  * Returns:		vector<string>
  *				A solution to the current maze, or an empty vector if none exists
  */
+
+int start_x = -1;
+int start_y = -1;
+int end_x = -1;
+int end_y = -1;
+
 vector<string> Pathfinder::solveMaze() {
 	for (int x = 0; x < MAZE_WIDTH; x++) {     //create test maze to modify
 		for (int y = 0; y < MAZE_HEIGHT; y++) {
 				test_maze[x][y] = Maze[x][y];
 		}
 	}
+	/*started here, changed 6/11*/
+	//int start_point = test_maze[0][0]; //make sure maze start point is open
+	//int end_point = test_maze[(MAZE_WIDTH - 1)][(MAZE_HEIGHT - 1)];  //make sure maze end point is open
+	//if (start_point != 1 || end_point != 1) {
+		//cout << "invalid entrance and/or exit to maze";
+	//}
 
-	int start_point = test_maze[0][0]; //make sure maze start point is open
-	int end_point = test_maze[(MAZE_WIDTH - 1)][(MAZE_HEIGHT - 1)];  //make sure maze end point is open
-	if (start_point != 1 || end_point != 1) {
-		cout << "invalid entrance and/or exit to maze";
+	
+
+	for (int i = 0; i < Pathfinder::MAZE_WIDTH; i++){
+		for (int j = 0; j < Pathfinder::MAZE_HEIGHT; j++){
+			if (Pathfinder::Maze[i][j] == 2){
+				start_x = i;
+				start_y = j;
+			}
+			if (Pathfinder::Maze[i][j] == 3){
+				end_x = i;
+				end_y = j;
+			}
+		}
+	}
+	if (start_x == -1 || end_x == -1 || start_y == -1 || end_y == -1){  //changed 6/11
+		cout << "No entrance and/or exit to maze found." << endl;
 	}
 
-	Pathfinder::solvemaze(0,0);			//starting point
+	Pathfinder::solvemaze(start_x, start_y);			//starting point  ended here changed 6/11
 
 	//cout <<"path vector: "<<endl;
-	if (path_vector.empty()){
+	if(path_vector.empty()){
 		cout << "Maze Unsolvable" << endl;  //if nothing in vector then no solution found
 	}
-	/*for (int i = 0; i < path_vector.size(); i++){
-		cout << path_vector[i] << endl;
-	}*/ //this prints path_vector
+	//for (int i = 0; i < path_vector.size(); i++){
+		//cout << path_vector[i] << endl;
+	//} //this prints path_vector
 	
 	/*cout << endl << "Test maze after run-through.  8 marks true path, 5 marks visited: " << endl;    
 	for (int y = 0; y < MAZE_WIDTH; y++) {             //the following for loops print the marked-up maze from beginning to end. 
@@ -224,31 +248,35 @@ string coords_to_string(int x, int y) {
 
 bool Pathfinder::solvemaze(int current_x, int current_y)
 {
-	
+
 	int path = 8; //mark test maze as path
 	int visited = 5;  //mark test maze as visited
 	int barrier = 0;  //mark as barrier.  Not used in this code.
 
+	if ((test_maze[current_x][current_y] == 5 || test_maze[current_x][current_y] == 8) && ((current_x < MAZE_WIDTH) && (current_y < MAZE_HEIGHT))){  //6/11
+		path_vector.push_back(coords_to_string(current_x, current_y));
+		full_path.push_back(Point(current_x, current_y));
+	}
 
 
 
 
-	if (current_x < 0 || current_y < 0  || current_x > (MAZE_WIDTH - 1) || current_y > (MAZE_HEIGHT - 1)) {
+	if (current_x < 0 || current_y < 0 || current_x >(MAZE_WIDTH - 1) || current_y >(MAZE_HEIGHT - 1)) {
 		//cout <<"Cell is out of bounds" <<endl;  //cell is out of bounds
 		return false;
 	}
-	else if (current_x == (MAZE_WIDTH - 1) && current_y == (MAZE_HEIGHT - 1)) {
+	else if (current_x == end_x && current_y == end_y) {  //changed 6/11
 		test_maze[current_x][current_y] = path; //cell is on path
 		path_vector.push_back(coords_to_string(current_x, current_y));
 		full_path.push_back(Point(current_x, current_y));
 		//cout << "Exit Found." << endl;
 		return true;     			//and is maze exit
-	
+
 	}
-	else if (test_maze[current_x][current_y] != 1) {
+	else if (test_maze[current_x][current_y] != 1 && test_maze[current_x][current_y] != 2 && test_maze[current_x][current_y] != 3) {  //changed 6/11
 		//cout<<"cell is on barrier or dead end or visited at: " <<current_x<<", " <<current_y<<endl;
 		return false;  //cell is on a barrier or dead end
-		
+
 	}
 	test_maze[current_x][current_y] = path;  //mark as on path because coordinate is not out of bounds, maze exit, or barrier or dead end
 
@@ -256,21 +284,22 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 	full_path.push_back(Point(current_x, current_y));
 
 
-	if(solvemaze(current_x+1, current_y) == true){
+	if (solvemaze(current_x + 1, current_y) == true){
 		return true;
 	}
-	if(solvemaze(current_x, current_y+1) == true){
+	if (solvemaze(current_x, current_y + 1) == true){
 		return true;
 	}
-	if(solvemaze(current_x-1, current_y) == true){
+	if (solvemaze(current_x - 1, current_y) == true){
 		return true;
 	}
-	if(solvemaze(current_x, current_y-1) == true){
+	if (solvemaze(current_x, current_y - 1) == true){
 		return true;
 	}
 	test_maze[current_x][current_y] = visited;  //been here, doesn't work
-	//path_vector.pop_back(); //pop back coordinates.  Omit this line if you want the entire path of the maze traversal to be printed,
-													//including all paths traversed, not just the solution path.
+	//if (test_maze[current_x][current_y] == 5){ //6/11
+		//path_vector.pop_back(); //pop back coordinates.  Omit this line if you want the entire path of the maze traversal to be printed,
+	//}			6/11									//including all paths traversed, not just the solution path.
 													//note: doesn't print full return path, prints all paths tried, but after unsuccessful venture
 													//into a path it resumes at the point before that path.
 	return false;
@@ -283,6 +312,14 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 
 
 
-vector<Point> Pathfinder::return_path(){
-	return full_path;
+stack<Point> Pathfinder::return_path(){  //6/11
+	stack<Point> points_path;
+	for (int i = 0; i < full_path.size() - 1; i++){
+		points_path.push(full_path[full_path.size()-1 - i]);
+	}
+	return points_path;
+}
+
+vector<string> Pathfinder::return_path_string(){
+	return path_vector;
 }
