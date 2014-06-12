@@ -4,14 +4,25 @@
 #include <vector>
 #include <iostream>
 #include <stack>
-//includes player for node definition
-#include "player.h"
 
 #ifndef PATHFINDER_H_
 #define PATHFINDER_H_
 
 
 using namespace std;
+
+struct Point{
+	int x;
+	int y;
+	Point(int x, int y){
+		this->x = x;
+		this->y = y;
+	}
+	Point(){
+		x = 0;
+		y = 0;
+	}
+};
 
 
 class Pathfinder {
@@ -111,8 +122,8 @@ public:
 	*return_path
 	*returns points of full maze traversal
 	*/
-	vector<Point> return_path();
-
+	stack<Point> return_path();
+	vector<string> return_path_string();
 private:
 	static const int MAZE_WIDTH = 10;  //update this for maze width
 	static const int MAZE_HEIGHT = 10;  //update this for maze height
@@ -120,7 +131,7 @@ private:
 	int test_maze[MAZE_WIDTH][MAZE_HEIGHT];  //this maze is a copy of Maze[][], and is marked up with the path and visited cells for the solution.
 	int current_x;
 	int current_y;
-	vector<Point> full_path;  //path to end goal
+	vector<Point> full_path;  //patfh to end goal
 	vector<string> path_vector;
 };
 
