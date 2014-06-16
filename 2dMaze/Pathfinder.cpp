@@ -519,10 +519,10 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 
 
 	
-	if ((test_maze[current_x][current_y] == 5 || test_maze[current_x][current_y] == 8) && ((current_x < MAZE_WIDTH) && (current_y < MAZE_HEIGHT))){  //6/11
+	/*if ((test_maze[current_x][current_y] == 5 || test_maze[current_x][current_y] == 8) && ((current_x < MAZE_WIDTH) && (current_y < MAZE_HEIGHT))){  //6/11
 		path_vector.push_back(coords_to_string(current_x, current_y));
 		full_path.push_back(Point(current_x, current_y));
-	}
+	}*/
 
 
 
