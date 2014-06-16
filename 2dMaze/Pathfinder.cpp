@@ -518,13 +518,13 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 
 
 
-	
-	/*if ((test_maze[current_x][current_y] == 5 || test_maze[current_x][current_y] == 8) && ((current_x < MAZE_WIDTH) && (current_y < MAZE_HEIGHT))){  //6/11
+	/*
+	if ((test_maze[current_x][current_y] == 5 || test_maze[current_x][current_y] == 8) && ((current_x < MAZE_WIDTH) && (current_y < MAZE_HEIGHT))){  //6/11
 		path_vector.push_back(coords_to_string(current_x, current_y));
 		full_path.push_back(Point(current_x, current_y));
-	}*/
+	}
 
-
+	*/
 
 
 	if (current_x < 0 || current_y < 0 || current_x >(MAZE_WIDTH - 1) || current_y >(MAZE_HEIGHT - 1)) {
@@ -564,14 +564,13 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 	}
 	test_maze[current_x][current_y] = visited;  //been here, doesn't work
 	if (test_maze[current_x][current_y] == 5){ //6/11
-		path_vector.pop_back(); //pop back coordinates.  Omit this line if you want the entire path of the maze traversal to be printed,
-		full_path.pop();
-	}			//6/11									//including all paths traversed, not just the solution path.
+		full_path.pop_back(); //pop back coordinates.  Omit this line if you want the entire path of the maze traversal to be printed,
+	}			6/11									//including all paths traversed, not just the solution path.
 													//note: doesn't print full return path, prints all paths tried, but after unsuccessful venture
 													//into a path it resumes at the point before that path.
 	return false;
 
-	
+	*/
 	
 
 }  //end bool solvemaze
@@ -580,8 +579,10 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 
 
 stack<Point> Pathfinder::return_path(){  //  6/11
-	
-	return full_path;
+	for (int i = 0; i < full_path.size(); i++){
+		mazeSolution.push(full_path[full_path.size() - 1]);
+	}
+	return mazeSolution;
 }
 
 vector<string> Pathfinder::return_path_string(){
