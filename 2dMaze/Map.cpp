@@ -7,6 +7,7 @@ Map::Map(string filePath)
 	//create the vector map
 	std::ifstream file;
 	file.open(filePath);
+	if (!file){ throw 1; }
 	while (!file.eof()){
 		vector<int> store;
 		while (file.peek() != '\n'){
@@ -24,15 +25,12 @@ Map::Map(string filePath)
 	}
 	file.close();
 	//create the tiles for the map
-	canGo = al_create_bitmap(TILE_SIZE, TILE_SIZE);
-	al_set_target_bitmap(canGo);
-	al_clear_to_color(al_map_rgb(0, 255, 0));
-	noGo = al_create_bitmap(TILE_SIZE, TILE_SIZE);
-	al_set_target_bitmap(noGo);
-	al_clear_to_color(al_map_rgb(255, 0, 0));
-	goal = al_create_bitmap(TILE_SIZE, TILE_SIZE);
-	al_set_target_bitmap(goal);
-	al_clear_to_color(al_map_rgb(177, 177, 0));
+	
+	canGo = al_load_bitmap("resource/ground40.png");
+	noGo = al_load_bitmap("resource/water40.png");
+	//goal = al_load_bitmap("");
+	goal = al_load_bitmap("resource/water.png");
+	al_convert_mask_to_alpha(goal, al_map_rgb(32, 114, 157));
 	level = al_create_bitmap(TILE_SIZE*map[0].size(), TILE_SIZE*map.size());
 
 		//find and create players
@@ -57,17 +55,18 @@ Map::Map(string filePath)
 void Map::updateBitmap(){
 
 	al_set_target_bitmap(level);
-	int TILE_SIZE = al_get_bitmap_width(person.getPlayer());
+	
 	for (int i = 0; i < map.size(); i++){
 		for (int j = 0; j < map[i].size(); j++){
-			if (map[i][j] == 1){
+			if (map[i][j] == 0){
 				al_draw_bitmap(noGo, j*TILE_SIZE, i * TILE_SIZE, 0);
 			}
-			else if (map[i][j] == 0){
+			else if (map[i][j] == 1){
 				al_draw_bitmap(canGo, j * TILE_SIZE, i * TILE_SIZE, 0);
 			}
 			else if (map[i][j] == 2){
 				al_draw_bitmap(canGo, j * TILE_SIZE, i * TILE_SIZE, 0);
+				
 				
 			}
 			else if (map[i][j] == 3){
@@ -85,8 +84,8 @@ void Map::movePlayer(Point newLocation){
 
 	if (newLocation.x >= 0 && newLocation.x < map[0].size() && newLocation.y < map.size() && newLocation.y >= 0){
 		
-		if (map[newLocation.y][newLocation.x] == 1){
-
+		if (map[newLocation.y][newLocation.x] == 0){
+		cout << "invalid tile at " << newLocation.x << ", " << newLocation.y << endl;
 		}
 		else{
 			person.move(newLocation);
@@ -118,6 +117,9 @@ bool Map::levelFinished(){
 
 Map::~Map()
 {
-
+	/*al_destroy_bitmap(canGo);
+	al_destroy_bitmap(noGo);
+	al_destroy_bitmap(goal);*/
+	//al_destroy_bitmap(level);
 
 }

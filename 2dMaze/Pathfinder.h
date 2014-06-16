@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <stack>
+#include "Point.h"
 
 #ifndef PATHFINDER_H_
 #define PATHFINDER_H_
@@ -11,23 +12,11 @@
 
 using namespace std;
 
-struct Point{
-	int x;
-	int y;
-	Point(int x, int y){
-		this->x = x;
-		this->y = y;
-	}
-	Point(){
-		x = 0;
-		y = 0;
-	}
-};
 
 
 class Pathfinder {
 public:
-	Pathfinder();
+	Pathfinder(string);
 	~Pathfinder();
 
 
@@ -58,7 +47,7 @@ public:
 	 * in the entrance cell (0, 0) and in the exit cell (MAZE_WIDTH - 1, MAZE_HEIGHT  - 1).  The generated maze may be
 	 * solvable or unsolvable, and this method should be able to produce both kinds of mazes.
 	 */
-	void createRandomMaze();
+	void createRandomMaze(int width, int height, string fileName);
 
 	/*
 	 * importMaze
@@ -125,14 +114,19 @@ public:
 	stack<Point> return_path();
 	vector<string> return_path_string();
 private:
-	static const int MAZE_WIDTH = 10;  //update this for maze width
-	static const int MAZE_HEIGHT = 10;  //update this for maze height
-	int Maze[MAZE_WIDTH][MAZE_HEIGHT];  //original maze to be used
-	int test_maze[MAZE_WIDTH][MAZE_HEIGHT];  //this maze is a copy of Maze[][], and is marked up with the path and visited cells for the solution.
+	void changePath(vector<vector<int>>&, Point, Point);
+	int MAZE_WIDTH;  //update this for maze width
+	int MAZE_HEIGHT;  //update this for maze height
+	vector<vector<int>> map;
+	//int Maze[MAZE_WIDTH][MAZE_HEIGHT];  //original maze to be used
+	//int test_maze[MAZE_WIDTH][MAZE_HEIGHT];  //this maze is a copy of Maze[][], and is marked up with the path and visited cells for the solution.
 	int current_x;
 	int current_y;
 	vector<Point> full_path;  //patfh to end goal
 	vector<string> path_vector;
+	stack<Point> mazeSolution;
+	Point start;
+	Point end;
 };
 
 #endif /* PATHFINDER_H_ */

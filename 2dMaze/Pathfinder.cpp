@@ -4,13 +4,16 @@
 #include <cstdlib>
 #include <sstream>
 #include <fstream>
+#include "Point.h"
 
-
-Pathfinder::Pathfinder() {
+Pathfinder::Pathfinder(string filePath) {
 	// TODO Auto-generated constructor stub
 	srand(time(NULL));
 	current_x = 0;
 	current_y = 0;
+	importMaze(filePath);
+
+
 }
 
 Pathfinder::~Pathfinder() {
@@ -34,6 +37,7 @@ Pathfinder::~Pathfinder() {
  * Returns:		string
  *				A single string representing the current maze
  */
+/*
 string Pathfinder::getMaze() {
 	string bad_string = "INVALID";
 	if (Maze[0][0] != 1 || Maze[(MAZE_WIDTH - 1)][(MAZE_HEIGHT - 1)] != 1) {
@@ -53,7 +57,7 @@ string Pathfinder::getMaze() {
 	return output_string;
 
 }   //end getMaze
-
+*/
 /*
  * createRandomMaze
  *
@@ -63,26 +67,227 @@ string Pathfinder::getMaze() {
  * in the entrance cell (0, 0) and in the exit cell (MAZE_WIDTH - 1, MAZE_HEIGHT - 1).  The generated maze may be
  * solvable or unsolvable, and this method should be able to produce both kinds of mazes.
  */
-void Pathfinder::createRandomMaze() {
-	cout<<"random maze:";
-	for (int x = 0; x < MAZE_WIDTH; x++) {
-		for (int y = 0; y < MAZE_HEIGHT; y++) {
-				int r = (rand() % (1 + 1));
-				Maze[x][y] = r;
-		}
-	}
-	Maze[0][0] = 1;  //maze start must be 1
-	Maze[(MAZE_WIDTH - 1)][(MAZE_HEIGHT - 1)] = 1;  //maze end must be 1
 
-	for (int x = 0; x < MAZE_WIDTH; x++) {
-		for (int y = 0; y < MAZE_HEIGHT; y++) {
-				cout << Maze[x][y];
+void Pathfinder::createRandomMaze(int width, int height, string fileName) {
+	
+	//create map size
+	vector<vector<int>> tempMap;
+	for (int i = 0; i < width; i++){
+		vector<int> temp;
+		for (int j = 0; j < height; j++){
+			temp.push_back(0);
 		}
+		tempMap.push_back(temp);
+
+	}
+	//create start
+	Point start(20 % width, 20 % height);
+	stack<Point> nextPoint;
+	nextPoint.push(start);
+	int pathSize = 3;
+
+	while (!nextPoint.empty()){
+		Point current = nextPoint.top();
+		nextPoint.pop();
+		//right
+		//check if the next location is allowed
+		
+			bool pathValid = true;
+			if (current.x + pathSize + 1 > width){
+
+								pathValid = false;
+							}
+			else{
+				if (tempMap[current.y][current.x + pathSize + 1] != 0){
+					pathValid = false;
+				}
+				for (int i = pathSize; i > 0; i--){
+					if (current.y - 1 >= 0){
+						if (tempMap[current.y - 1][current.x + i] != 0){
+							pathValid = false;
+						}
+					}
+					if (current.y + 1 < height){
+						if (tempMap[current.y + 1][current.x + i] != 0){
+							pathValid = false;
+						}
+					}
+
+					if (tempMap[current.y][current.x + i] != 0){
+						pathValid = false;
+
+					}
+				}
+			}
+			
+			if (pathValid){
+				Point newPoint(current.x + pathSize, current.y);
+				changePath(tempMap, current, newPoint);
+				nextPoint.push(newPoint);
+			}
+			
+			
+		//write location and put location as the next to be run
+
+		//left
+			pathValid = true;
+			if (current.x - pathSize - 1 < 0){
+				pathValid = false;
+			}
+			else{
+				if (tempMap[current.y][current.x - pathSize - 1] != 0){
+					pathValid = false;
+				}
+				for (int i = pathSize; i > 0; i--){
+					if (current.y - 1 >= 0){
+						if (tempMap[current.y-1][current.x - i] != 0){
+							pathValid = false;
+						}
+					}
+					if (current.y + 1 < width){
+						if (tempMap[current.y+1][current.x - i] != 0){
+							pathValid = false;
+						}
+					}
+					if (tempMap[current.y][current.x - i] != 0){
+						pathValid = false;
+
+					}
+				}
+			}
+			if (pathValid){
+				Point newPoint(current.x - pathSize, current.y);
+				changePath(tempMap, current, newPoint);
+				nextPoint.push(newPoint);
+			}
+
+		//down
+			pathValid = true;
+			if (current.y + pathSize + 1 >= height){
+				pathValid = false;
+			}
+			else{
+				if (tempMap[current.y + pathSize + 1][current.x] != 0){
+					pathValid = false;
+				}
+				for (int i = pathSize; i > 0; i--){
+					if (current.x + 1 < width){
+						if (tempMap[current.y + i][current.x + 1] != 0){
+							pathValid = false;
+						}
+					}
+					if (current.x - 1 <= 0){
+						if (tempMap[current.y + i][current.x-1] != 0){
+							pathValid = false;
+						}
+					}
+					if (tempMap[current.y + i][current.x] != 0){
+						pathValid = false;
+
+					}
+				}
+			}
+			if (pathValid){
+				Point newPoint(current.x, current.y + pathSize);
+				changePath(tempMap, current, newPoint);
+				nextPoint.push(newPoint);
+			}
+		//up
+			pathValid = true;
+			if (current.y - pathSize - 1 < 0){
+				pathValid = false;
+			}
+			else{
+				if (tempMap[current.y - pathSize - 1][current.x] != 0){
+					pathValid = false;
+				}
+				for (int i = pathSize; i > 0; i--){
+
+					if (current.x - 1 >= 0){
+						if (tempMap[current.y - i][current.x - 1] != 0){
+							pathValid = false;
+						}
+					}
+					if (current.x + 1 < width){
+						if (tempMap[current.y - i][current.x + 1] != 0){
+							pathValid = false;
+						}
+					}
+					if (tempMap[current.y - i][current.x] != 0){
+						pathValid = false;
+
+					}
+				}
+			}
+			if (pathValid){
+				Point newPoint(current.x, current.y - pathSize);
+				changePath(tempMap, current, newPoint);
+				nextPoint.push(newPoint);
+			}
+
 	}
 
-	cout << endl;
+	tempMap[start.y][start.x] = 2;
+
+	//write maze to file
+	std::ofstream file;
+	file.open(fileName);
+	if (!file){ throw 1; }
+	for(int i = 0; i < tempMap.size(); i++){
+		vector<int> out = tempMap[i];
+		for (int j = 0; j < out.size(); j++){
+
+			
+			file << out.at(j);
+			if (j < out.size() - 1){
+				file << " ";
+			}
+
+		}
+
+		file << endl;
+	}
+	file.close();
+	
 
 }    //end createRandomMaze
+
+void Pathfinder::changePath(vector<vector<int>> &map, Point begin, Point finish){
+
+
+
+
+	if (begin.x - finish.x == 0){
+		int dist = finish.y - begin.y;
+		if (dist > 0){
+			for (int i = 0; i < dist; i++){
+				map[begin.y + i][begin.x] = 1;
+			}
+		}
+		else if(dist < 0){
+			dist *= -1;
+			for (int i = 0; i < dist; i++){
+				map[begin.y - i][begin.x] = 1;
+			}
+		}
+		
+	}
+	else if (begin.y - finish.y == 0){
+		int dist = finish.x - begin.x;
+		if (dist > 0){
+			for (int i = 0; i < dist; i++){
+				map[begin.y][begin.x + i] = 1;
+			}
+		}
+		else if (dist < 0){
+			dist *= -1;
+			for (int i = 0; i < dist; i++){
+				map[begin.y][begin.x - i] = 1;
+			}
+		}
+	}
+
+}
 
 /*
  * importMaze
@@ -99,11 +304,40 @@ void Pathfinder::createRandomMaze() {
  *				True if the maze is imported correctly; false otherwise
  */
 
-bool Pathfinder::importMaze(string file_name) {
+bool Pathfinder::importMaze(string filePath) {
+
+	map.clear();
+	while (!mazeSolution.empty()){
+		mazeSolution.pop();
+	}
+	std::ifstream file;
+	file.open(filePath);
+	if (!file){ throw 1; }
+	while (!file.eof()){
+		vector<int> store;
+		while (file.peek() != '\n'){
+
+			int num;
+			file >> num;
+			if (file.fail())break;
+			store.push_back(num);
+
+		}
+
+		file.ignore();
+		map.push_back(store);
+		store.clear();
+	}
+	file.close();
+	MAZE_WIDTH = map[0].size();
+	MAZE_HEIGHT = map.size();
+
+	solveMaze();
+	/*
 	string variable = "";
 	int counter = 0;
 	bool is_valid = true;
-	ifstream infile(file_name.c_str());
+	ifstream infile(file_name);
 
 	if (infile.is_open()) {
 		if (infile.fail()) {
@@ -124,11 +358,11 @@ bool Pathfinder::importMaze(string file_name) {
 		infile.close();
 
 	}					//end if infile is open
-
+	
 	if (is_valid) {
 		int variable2 = 0;
 		//cout << "is valid apparently...";
-		ifstream infile(file_name.c_str());
+		ifstream infile(file_name);
 		if (infile.is_open()) {
 			if (infile.fail()) {
 				cout << "File read failed code location 2.";
@@ -153,6 +387,7 @@ bool Pathfinder::importMaze(string file_name) {
 		cout << "Did not change maze because imported maze is invalid";
 		return false;
 	}
+	*/
 }					//end import maze
 
 /*
@@ -173,17 +408,13 @@ bool Pathfinder::importMaze(string file_name) {
  *				A solution to the current maze, or an empty vector if none exists
  */
 
-int start_x = -1;
-int start_y = -1;
-int end_x = -1;
-int end_y = -1;
 
 vector<string> Pathfinder::solveMaze() {
-	for (int x = 0; x < MAZE_WIDTH; x++) {     //create test maze to modify
+	/*for (int x = 0; x < MAZE_WIDTH; x++) {     //create test maze to modify
 		for (int y = 0; y < MAZE_HEIGHT; y++) {
 				test_maze[x][y] = Maze[x][y];
 		}
-	}
+	}*/
 	/*started here, changed 6/11*/
 	//int start_point = test_maze[0][0]; //make sure maze start point is open
 	//int end_point = test_maze[(MAZE_WIDTH - 1)][(MAZE_HEIGHT - 1)];  //make sure maze end point is open
@@ -193,28 +424,28 @@ vector<string> Pathfinder::solveMaze() {
 
 	
 
-	for (int i = 0; i < Pathfinder::MAZE_WIDTH; i++){
-		for (int j = 0; j < Pathfinder::MAZE_HEIGHT; j++){
-			if (Pathfinder::Maze[i][j] == 2){
-				start_x = i;
-				start_y = j;
+	for (int i = 0; i < MAZE_WIDTH; i++){
+		for (int j = 0; j < MAZE_HEIGHT; j++){
+			if (map[j][i] == 2){
+				start.x = i;
+				start.y = j;
 			}
-			if (Pathfinder::Maze[i][j] == 3){
-				end_x = i;
-				end_y = j;
+			if (map[j][i] == 3){
+				end.x = i;
+				end.y = j;
 			}
 		}
 	}
-	if (start_x == -1 || end_x == -1 || start_y == -1 || end_y == -1){  //changed 6/11
+/*	if (start_x == -1 || end_x == -1 || start_y == -1 || end_y == -1){  //changed 6/11
 		cout << "No entrance and/or exit to maze found." << endl;
 	}
-
-	Pathfinder::solvemaze(start_x, start_y);			//starting point  ended here changed 6/11
+	*/
+	solvemaze(start.x, start.y);			//starting point  ended here changed 6/11
 
 	//cout <<"path vector: "<<endl;
-	if(path_vector.empty()){
+	/*if(path_vector.empty()){
 		cout << "Maze Unsolvable" << endl;  //if nothing in vector then no solution found
-	}
+	}*/
 	//for (int i = 0; i < path_vector.size(); i++){
 		//cout << path_vector[i] << endl;
 	//} //this prints path_vector
@@ -248,11 +479,46 @@ string coords_to_string(int x, int y) {
 
 bool Pathfinder::solvemaze(int current_x, int current_y)
 {
+	if (current_x >= MAZE_WIDTH || current_y >= MAZE_HEIGHT || current_x < 0 || current_y < 0){
+		return false;
+	}
 
-	int path = 8; //mark test maze as path
+	int path = 1; //mark test maze as path
 	int visited = 5;  //mark test maze as visited
 	int barrier = 0;  //mark as barrier.  Not used in this code.
+	int end = 3;
 
+	if (map[current_y][current_x] == end){
+		mazeSolution.push(Point(current_x, current_y));
+		return true;
+	}
+	else if (map[current_y][current_x] == barrier || map[current_y][current_x] == visited){
+		return false;
+	}
+	else if (map[current_y][current_x] == 1 || map[current_y][current_x] == 2){
+		map[current_y][current_x] = visited;
+		if (solvemaze(current_x+1, current_y)){
+			mazeSolution.push(Point(current_x, current_y));
+			return true;
+		}
+		if (solvemaze(current_x-1, current_y)){
+			mazeSolution.push(Point(current_x, current_y));
+			return true;
+		}
+		if (solvemaze(current_x, current_y+1)){
+			mazeSolution.push(Point(current_x, current_y));
+			return true;
+		}
+		if (solvemaze(current_x, current_y-1)){
+			mazeSolution.push(Point(current_x, current_y));
+			return true;
+		}
+
+	}
+
+
+
+	/*
 	if ((test_maze[current_x][current_y] == 5 || test_maze[current_x][current_y] == 8) && ((current_x < MAZE_WIDTH) && (current_y < MAZE_HEIGHT))){  //6/11
 		path_vector.push_back(coords_to_string(current_x, current_y));
 		full_path.push_back(Point(current_x, current_y));
@@ -304,7 +570,7 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 													//into a path it resumes at the point before that path.
 	return false;
 
-
+	*/
 	
 
 }  //end bool solvemaze
@@ -312,12 +578,9 @@ bool Pathfinder::solvemaze(int current_x, int current_y)
 
 
 
-stack<Point> Pathfinder::return_path(){  //6/11
-	stack<Point> points_path;
-	for (int i = 0; i < full_path.size() - 1; i++){
-		points_path.push(full_path[full_path.size()-1 - i]);
-	}
-	return points_path;
+stack<Point> Pathfinder::return_path(){  //  6/11
+	
+	return mazeSolution;
 }
 
 vector<string> Pathfinder::return_path_string(){

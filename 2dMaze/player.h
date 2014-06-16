@@ -1,25 +1,16 @@
-#pragma once
+
 #include <string>
 #include <vector>
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_image.h>
+#include <iostream>
+#include "Point.h"
 
 using namespace std;
 
-struct Point{
-	int x;
-	int y;
-	Point(int x, int y){
-		this->x = x;
-		this->y = y;
-	}
-	Point(){
-		x = 0;
-		y = 0;
-	}
-};
 
-const int TILE_SIZE = 80;
+
+const int TILE_SIZE = 40;
 
 class player
 {
@@ -34,7 +25,11 @@ public:
 	void setY(int);
 	~player();
 private:
-	ALLEGRO_BITMAP* image;
+	ALLEGRO_BITMAP* current;
+	ALLEGRO_BITMAP* left;
+	ALLEGRO_BITMAP* right;
+	ALLEGRO_BITMAP* down;
+	ALLEGRO_BITMAP* up;
 	Point location;
 	
 };
