@@ -5,6 +5,9 @@
 #include <iostream>
 #include <stack>
 #include "Point.h"
+#include "pQueue.h"
+#include "Set.h"
+#include "PointNode.h"
 
 #ifndef PATHFINDER_H_
 #define PATHFINDER_H_
@@ -113,7 +116,10 @@ public:
 	*/
 	stack<Point> return_path();
 	vector<string> return_path_string();
+	//this will fill mazeSolution with the path from point a to b
+	void findPathA(Point, Point);
 private:
+	
 	void changePath(vector<vector<int>>&, Point, Point);
 	int MAZE_WIDTH;  //update this for maze width
 	int MAZE_HEIGHT;  //update this for maze height

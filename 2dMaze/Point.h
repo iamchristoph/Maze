@@ -6,4 +6,5 @@ public:
 	Point(int, int);
 	Point();
 	~Point();
+	bool operator==(const Point&);
 };

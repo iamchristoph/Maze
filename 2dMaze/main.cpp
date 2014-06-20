@@ -20,7 +20,7 @@ int displayWidth = 800;
 string toString(int);
 
 int main(){
-	const float FPS = 40;
+	const float FPS = 10;
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	ALLEGRO_TIMER *timer = NULL;
@@ -43,7 +43,7 @@ int main(){
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	//setup for timer
 	timer = al_create_timer(1 / FPS);
-	opponentSpeed = al_create_timer(.2);
+	opponentSpeed = al_create_timer(.04);
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_timer_event_source(opponentSpeed));
 
@@ -53,17 +53,19 @@ int main(){
 	//al_init_primitives_addon();
 	//plevel tracks the current players level
 	int plevel = 1;
-	int clevel = 1;
+	int clevel = 2;
 	
 	Map* level = new Map("resource/map" + toString(plevel) + ".txt");
 	
-	Map* computer = new Map("resource/map1.txt");
+	Map* computer = new Map("resource/map" + toString(clevel) + ".txt");
 
 	//create a path to the end of the level
-	Pathfinder finder("resource/map1.txt");
+	cout << "starting path finding" << endl;
+	Pathfinder finder("resource/map" + toString(clevel) + ".txt");
+	cout << "path found\n";
 	stack<Point> path;
 	path = finder.return_path();
-	finder.createRandomMaze(30, 30, "resource/generatedMap.txt");
+	//finder.createRandomMaze(160, 160, "resource/generatedMap.txt");
 	
 	
 
@@ -88,6 +90,9 @@ int main(){
 					computer->movePlayer(path.top());
 					path.pop();
 				}
+				else {
+					//path = finder.return_path();
+				}
 				//gameOver = true;
 
 			}
@@ -101,7 +106,7 @@ int main(){
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
 			al_draw_bitmap(left, 0, 0, 0);
-			al_draw_bitmap(right, displayWidth / 2, 0, 0);
+			al_draw_bitmap(right, (displayWidth / 2) + 2, 0, 0);
 			al_destroy_bitmap(left);
 			al_destroy_bitmap(right);
 			al_flip_display();
@@ -120,7 +125,8 @@ int main(){
 			}
 			if (computer->levelFinished()){
 				//gameOver = true;
-
+				al_stop_timer(timer);
+				al_stop_timer(opponentSpeed);
 				delete computer;
 				string next = "resource/map";
 				clevel++;
@@ -133,6 +139,9 @@ int main(){
 					path = finder.return_path();
 				}
 				catch (int e){ if (e == 1)gameOver = true; }
+
+				al_start_timer(timer);
+				al_start_timer(opponentSpeed);
 			}
 		}
 		

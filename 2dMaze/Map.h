@@ -28,6 +28,7 @@ private:
 	ALLEGRO_BITMAP* canGo;
 	ALLEGRO_BITMAP* noGo;
 	ALLEGRO_BITMAP* goal;
+	ALLEGRO_BITMAP* entrance;
 
 
 };

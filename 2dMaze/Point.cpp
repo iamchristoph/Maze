@@ -15,3 +15,14 @@ Point::Point(){
 Point::~Point()
 {
 }
+
+bool Point::operator==(const Point& rSide){
+	if (this->x == rSide.x){
+		if (this->y == rSide.y){
+			return true;
+		}
+
+	}
+	return false;
+
+}

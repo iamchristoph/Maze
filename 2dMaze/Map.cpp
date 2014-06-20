@@ -29,7 +29,11 @@ Map::Map(string filePath)
 	canGo = al_load_bitmap("resource/ground40.png");
 	noGo = al_load_bitmap("resource/water40.png");
 	//goal = al_load_bitmap("");
-	goal = al_load_bitmap("resource/water.png");
+	goal = al_load_bitmap("resource/door.png");
+	al_convert_mask_to_alpha(goal, al_map_rgb(32, 114, 157));
+	entrance = al_load_bitmap("resource/odoor.png");
+	al_convert_mask_to_alpha(entrance, al_map_rgb(32, 114, 157));
+
 	al_convert_mask_to_alpha(goal, al_map_rgb(32, 114, 157));
 	level = al_create_bitmap(TILE_SIZE*map[0].size(), TILE_SIZE*map.size());
 
@@ -59,18 +63,21 @@ void Map::updateBitmap(){
 	for (int i = 0; i < map.size(); i++){
 		for (int j = 0; j < map[i].size(); j++){
 			if (map[i][j] == 0){
-				al_draw_bitmap(noGo, j*TILE_SIZE, i * TILE_SIZE, 0);
+					al_draw_bitmap(noGo, j*TILE_SIZE, i * TILE_SIZE, 0);
 			}
 			else if (map[i][j] == 1){
 				al_draw_bitmap(canGo, j * TILE_SIZE, i * TILE_SIZE, 0);
 			}
 			else if (map[i][j] == 2){
 				al_draw_bitmap(canGo, j * TILE_SIZE, i * TILE_SIZE, 0);
-				
+				al_draw_bitmap(entrance, j * TILE_SIZE, i * TILE_SIZE, 0);
+
 				
 			}
 			else if (map[i][j] == 3){
+				al_draw_bitmap(canGo, j * TILE_SIZE, i * TILE_SIZE, 0);
 				al_draw_bitmap(goal, j * TILE_SIZE, i * TILE_SIZE, 0);
+
 			}
 
 		}
@@ -81,6 +88,10 @@ void Map::updateBitmap(){
 }
 
 void Map::movePlayer(Point newLocation){
+	//overwrite the player location
+	Point location = person.getLocation();
+	al_set_target_bitmap(level);
+	al_draw_bitmap(canGo, location.x * TILE_SIZE, location.y * TILE_SIZE, 0);
 
 	if (newLocation.x >= 0 && newLocation.x < map[0].size() && newLocation.y < map.size() && newLocation.y >= 0){
 		
@@ -95,8 +106,10 @@ void Map::movePlayer(Point newLocation){
 			}
 		}
 	}
-
-	updateBitmap();
+	//draw the player
+	location = person.getLocation();
+	al_draw_bitmap(person.getPlayer(), location.x * TILE_SIZE, location.y * TILE_SIZE, 0);
+	//updateBitmap();
 	
 }
 
