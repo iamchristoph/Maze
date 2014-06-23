@@ -61,8 +61,8 @@ int main(){
 
 	//create a path to the end of the level
 	Pathfinder finder("resource/map1.txt");
-	stack<Point> path;
-	path = finder.return_path();
+	//stack<Point> path;
+	//path = finder.return_path();
 	finder.createRandomMaze(30, 30, "resource/generatedMap.txt");
 	
 	
@@ -84,9 +84,14 @@ int main(){
 		//main drawing function
 		if (ev.type == ALLEGRO_EVENT_TIMER){
 			if(ev.timer.source == opponentSpeed){
-				if (!path.empty()){
-					computer->movePlayer(path.top());
-					path.pop();
+				if (finder._path.empty()){
+					finder.getPath(computer->getPlayerLocation()) // get next steps using current location as start
+				}
+
+				else {
+					computer->movePlayer(finder._path.top());
+					finder._path.pop();
+				
 				}
 				//gameOver = true;
 

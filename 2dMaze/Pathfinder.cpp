@@ -1,10 +1,6 @@
 
 #include "Pathfinder.h"
-#include <ctime>
-#include <cstdlib>
-#include <sstream>
-#include <fstream>
-#include "Point.h"
+
 
 Pathfinder::Pathfinder(string filePath) {
 	// TODO Auto-generated constructor stub
@@ -476,6 +472,102 @@ string coords_to_string(int x, int y) {
 	string output_string = str1 + ", " + str2;
 	return output_string;
 }
+
+bool solvemaze(Point current, Point direction); {}
+
+//get direction fills the direction stack with a set of random directions to try
+void Pathfinder::getDirection(void){
+	Point dir[4] = { Point(0, -1), Point(0, 1), Point(-1, 0), Point(1, 0) };
+	random_shuffle(dir[0], dir[3]);
+	for (int i = 0; i > 4; i++)
+	{
+		direction.push(Point(dir[i].x, dir[i].y));
+	}
+
+
+};
+
+bool Pathfinder::getPath(Point current)
+{
+	int distance = 3;
+	Point go;
+	getDirection();
+	do{
+		if (direction.empty())
+		{
+			direction.push(back);
+		}
+		else
+		{
+			go = direction.top();
+			direction.pop();
+		}
+	}while(!getPath(current, go, distance));
+	while (!direction.empty())
+	{
+		direction.pop();
+	}
+	back.x = 0;
+	back.y = 0;
+	return true;
+};
+
+bool Pathfinder::getPath(Point current, Point go, int distance)
+{
+
+	if (distance == 0)
+	{
+		return false;
+	}
+	current = current + go;
+	distance--;
+	if (current.x >= MAZE_WIDTH || current.y >= MAZE_HEIGHT || current.x < 0 || current.y < 0){
+		return false;
+	}
+
+	int path = 1; //mark test maze as path
+	int visited = 5;  //mark test maze as visited
+	int barrier = 0;  //mark as barrier.  Not used in this code.
+	int end = 3;
+
+	if (map[current.y][current.x] == end){
+		_path.push(Point(current.x, current.y));
+		distance = 0;
+		return true;
+	}
+	else if (map[current.y][current.x] == barrier || (map[current.y][current.x] == visited && go != back)){
+		distance = 0;
+		back = go;
+		return false;
+	}
+	else if (map[current_y][current_x] == 1 || map[current_y][current_x] == 2 || go == back){
+		map[current_y][current_x] = visited;
+		_path.push(current);
+		if (distance == 0){
+			return true;
+		}
+		else if (go == up || go == down){
+			if (getPath(current, left, 1)){
+				distance = 0;
+				_path.pop();
+			}
+			if (getPath(current, right, 1)){
+				distance = 0;
+				_path.pop();
+			}
+		}
+		else if (go == left || go == right){
+			if (getPath(current, up, 1)){
+				distance = 0;
+				_path.pop();
+			}
+			if (getPath(current, down, 1)){
+				distance = 0;
+				_path.pop();
+			}
+		}
+
+};
 
 bool Pathfinder::solvemaze(int current_x, int current_y)
 {

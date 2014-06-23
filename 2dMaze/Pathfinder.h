@@ -4,6 +4,10 @@
 #include <vector>
 #include <iostream>
 #include <stack>
+#include <ctime>
+#include <cstdlib>
+#include <sstream>
+#include <algorithm>
 #include "Point.h"
 
 #ifndef PATHFINDER_H_
@@ -91,7 +95,14 @@ public:
 	* If x+1 or y+1 (etc.) are not blocked by a wall (a '0') or out of bounds(x or y < 0, or MAZE_WIDTH, MAZE_HEIGHT), then this function returns true.
 	*/
 	bool solvemaze(int current_x, int current_y);
-
+	bool solvemaze(int current_x, int current_y, Point direction, int tries);
+	/*
+	* void getPath
+	*
+	* picks a random direction and generates ai path using solvmaze
+	*/
+	bool getPath(Point);
+	bool getPath(Point, Point, int);
 	/*
 	*return_full_maze_path_ints
 	*returns a stack of ints as coordinates for the full path of the maze traversal.
@@ -105,13 +116,15 @@ public:
 	*in the form x, y.
 	*/
 	stack<string> return_full_maze_path_string();
-
-
+	vector<Point> full_path;  //patfh to end goal
+	stack<Point> _path;
 	/*
 	*return_path
 	*returns points of full maze traversal
 	*/
 	stack<Point> return_path();
+
+	void getDirection(void);
 	vector<string> return_path_string();
 private:
 	void changePath(vector<vector<int>>&, Point, Point);
@@ -122,11 +135,18 @@ private:
 	//int test_maze[MAZE_WIDTH][MAZE_HEIGHT];  //this maze is a copy of Maze[][], and is marked up with the path and visited cells for the solution.
 	int current_x;
 	int current_y;
-	vector<Point> full_path;  //patfh to end goal
+	//get direction fills the direction stack with a set of random directions to try
+	stack<Point> direction;
 	vector<string> path_vector;
 	stack<Point> mazeSolution;
+
+	Point back;
 	Point start;
 	Point end;
+	Point up = Point(0, -1);
+	Point down = Point(0, 1);
+	Point left = Point(-1, 0);
+	Point right = Point(1, 0);
 };
 
 #endif /* PATHFINDER_H_ */
